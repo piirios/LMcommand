@@ -3,5 +3,5 @@ file_hash: lolollllllllll
 ----
 mkdir dev
 cd dev
-echo {%path:current%}
-type nul > {%i:entrez_nom_du_fichier%}
+type nul > {%i_s=filename:entrez_nom_du_fichier%}
+echo {%v=filename:%}

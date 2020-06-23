@@ -4,6 +4,7 @@ from caller import call
 def load_file(filename):
     with open('{}.lmcommand'.format(filename), 'r') as f:
         lines = f.readlines()
+        print(dir(lines[0]))
 
     return lines
 
@@ -20,14 +21,15 @@ def header_check(header):
     return token, filehash
 
 def command_traitement(content):
+    vars = {}
     for command in content:
         command = command.rstrip()
-        command = check_command_variables(command)
+        command = check_command_variables(command, vars)
         res = call(command)
         if res.returncode !=0:
             print(f"erreur: {res.stderr}")
 
-def check_command_variables(command):
+def check_command_variables(command, vars):
     if not '{%' in command:
         print('any command in this line')
         return command.split(' ')
@@ -37,21 +39,37 @@ def check_command_variables(command):
         print(command[id].split('{%')[1].split('%}')[0])
         variable = command[id].split('{%')[1].split('%}')[0]
         typev, value = variable.split(':')
-        value_var = variable_execute(typev.strip(), value.strip())
+        value_var, vars = variable_execute(typev.strip(), value.strip(), vars)
         command[id] = value_var
         print(f"variables type: {typev} value: {value} -> value:{value_var}") 
         return command
 
 
-def variable_execute(typev, value):
-    if typev == 'i':
+def variable_execute(typev, value, vars):
+    typev = typev.split('_')
+    
+    if len([typev.index(element) for element in typev if 'v' in element]) != 0:
+        id = [typev.index(element) for element in typev if 'v' in element][0]
+        varname = typev[id].split('=')[1]
+        value = vars[varname]
+
+    elif 'i' in typev:
         value = ' '.join(value.split('_'))
         value = input(f" {value}: ")
 
-    elif typev == 'path':
+    elif 'path' in typev:
         if value =='current':
             value = os.path.abspath(os.path.curdir)
-    return value
+
+    if len([typev.index(element) for element in typev if 's' in element]) != 0:
+        id = [typev.index(element) for element in typev if 's' in element][0]
+        varname = typev[id].split('=')[1]
+        vars[varname] = value
+        print(vars)
+
+    return value, vars
+
+
 l = load_file('test')
 header, content = separate_headers(l)
 creditential = header_check(header)

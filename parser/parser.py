@@ -1,3 +1,6 @@
+import os
+from caller import call
+
 def load_file(filename):
     with open('{}.lmcommand'.format(filename), 'r') as f:
         lines = f.readlines()
@@ -19,19 +22,36 @@ def header_check(header):
 def command_traitement(content):
     for command in content:
         command = command.rstrip()
-        check_command_variables(command)
-        command_list = command.split(' ')
-        print(command_list)
+        command = check_command_variables(command)
+        res = call(command)
+        if res.returncode !=0:
+            print(f"erreur: {res.stderr}")
 
 def check_command_variables(command):
     if not '{%' in command:
         print('any command in this line')
-        return False
+        return command.split(' ')
     else:
-        variable = command.split('{%')[1].split('%}')[0]
+        command = command.split(' ')
+        id = [command.index(element) for element in command if '{%' in element][0]
+        print(command[id].split('{%')[1].split('%}')[0])
+        variable = command[id].split('{%')[1].split('%}')[0]
         typev, value = variable.split(':')
-        print(typev, value)
+        value_var = variable_execute(typev.strip(), value.strip())
+        command[id] = value_var
+        print(f"variables type: {typev} value: {value} -> value:{value_var}") 
+        return command
 
+
+def variable_execute(typev, value):
+    if typev == 'i':
+        value = ' '.join(value.split('_'))
+        value = input(f" {value}: ")
+
+    elif typev == 'path':
+        if value =='current':
+            value = os.path.abspath(os.path.curdir)
+    return value
 l = load_file('test')
 header, content = separate_headers(l)
 creditential = header_check(header)

@@ -1,7 +1,7 @@
 token: 123456.testhash
 file_hash: lolollllllllll
 ----
-command:
 mkdir dev
 cd dev
-touch {%i: entrez le nom du fichier%}
+echo {%path:current%}
+type nul > {%i:entrez_nom_du_fichier%}

@@ -2,19 +2,23 @@
 """
 Created on Thu Jun 18 17:44:29 2020
 @author: Louis
+
+TODO:
+[] better import for the func
+
 """
 
 all_func = {}
 import dis
 
 
-class workflow:
-    def __init__(self, name, ltype='Private'):
+class Lmfunc:
+    def __init__(self, name, ltype='Private'): #init class with name of project and it's private's level
         self.ltype = ltype
         self.name = name
         self.func_list = {}
         
-    def func_params(self, func):
+    def func_params(self, func): #get all attribute of the func
         func_desc = {}
         func_desc['func'] = func
         func_desc['arg_nrb'] = func.__code__.co_argcount
@@ -23,48 +27,23 @@ class workflow:
         func_desc['doc'] = func.__doc__
         self.func_list[func.__name__] = func_desc
         
-    def __call__(self, func):
-        self.func_params(func)
-        def callabe(*args, **kwargs):
+    def __call__(self, func): #this this the decorator
+        self.func_params(func) #we call func_params for get all of attribute of the func
+        def callabe(*args, **kwargs): #this is the callabe for call the func out of the class
             result = func(*args, **kwargs)
             return result
         return callabe
             
-    def run_func(self, func_name, params=[]):
+    def run_func(self, func_name, params=[]): #function for intern func call
         return self.func_list[func_name]['func'](*params)
 
 
-if __name__ == '__main__':
-    wf = workflow('test')
 
-    @wf
-    def add(a,b):
-        return a + b
-
-    @wf
-    def diff(a,b):
-        return a - b
-
-    @wf
-    def mul(a,b, lol='lol', y='xd'):
-        """
-        ####this fonction multiply a and b
-        """
-        bg = 'bg'
-        alert = True
-        return a*b
-
-
-    r = wf.run_func('add', params=[3,6])
-    print(r)
-
-
-
-    def all_atribute(func):
-        print(func['func'].__doc__)
-        for attr in dir(func['func'].__code__):
-            if attr != 'co_code':
-                print('{} = {}'.format(attr, func['func'].__code__.__getattribute__(attr)))
-            else:
-                dis.dis(func['func'].__code__.__getattribute__(attr))
+def all_atribute(func):
+    print(func['func'].__doc__)
+    for attr in dir(func['func'].__code__):
+        if attr != 'co_code':
+            print('{} = {}'.format(attr, func['func'].__code__.__getattribute__(attr)))
+        else:
+            dis.dis(func['func'].__code__.__getattribute__(attr))
                 

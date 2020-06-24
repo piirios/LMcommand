@@ -29,17 +29,25 @@ def command_traitement(content):
         if res.returncode !=0:
             print(f"erreur: {res.stderr}")
 
-def check_command_variables(command, vars):
+def check_command_variables(command, vars, i=1):
+    print(f"command is {command}")
     if not '{%' in command:
         print('any command in this line')
         return command.split(' ')
     else:
         command = command.split(' ')
         id = [command.index(element) for element in command if '{%' in element][0]
-        print(command[id].split('{%')[1].split('%}')[0])
+        print(id)
+        #rint(command[id].split('{%')[1].split('%}')[0])
+        print(command[id].split('{%')[1])
         variable = command[id].split('{%')[1].split('%}')[0]
+        print(variable)
         typev, value = variable.split(':')
-        value_var, vars = variable_execute(typev.strip(), value.strip(), vars)
+        print(f"value before sub: {value}")
+        if 1+i < len(command[id].split('{%')):
+            value = check_command_variables(command[id].split('{%')[1+i].split('%}')[0], vars, i=i+1)
+        print(value)
+        value_var, vars = variable_execute(typev.strip(), ' '.join(value).strip(), vars)
         command[id] = value_var
         print(f"variables type: {typev} value: {value} -> value:{value_var}") 
         return command

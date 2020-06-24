@@ -1,5 +1,5 @@
-import subprocess as sp
+from subprocess import run
 
 def call(command):
     print(command)
-    return sp.run(command, capture_output=True, text=True, shell=True)
+    return run(command, capture_output=True, text=True, shell=True)

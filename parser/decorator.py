@@ -18,7 +18,7 @@ class var_func:
         if var_type in self.key:
             return self.func_list[var_type](*params)
         else:
-            raise NotImplementedError
+            raise NotImplementedError('Unknown type %s' % var_type)
 
 
 

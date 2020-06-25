@@ -1,6 +1,7 @@
 import os
 from caller import call
 from var_func import vf
+from LMprint import printc, strc
 
 """
 parser of the file:
@@ -40,24 +41,20 @@ def header_check(header): # TODO: implement file hash verification and token ver
 
 def command_traitement(content): #this is the core func where we call the var checker, call the func into subprocess and check the result
     vars = {}
-    print(content)
     for command in content:
         command = command.rstrip()
         command = check_command_variables(command, vars)
-        print(f"command for call is {command}")
+        printc(' '.join(command), ltype='Sy')
         res = call(command)
         if res.returncode !=0:
-            print(f"erreur: {res.stderr}")
+            printc(res.stderr.strip(), ltype='Sy', alert='C')
 
 def check_command_variables(command, vars, sub=False): #this function check if a variable is in the line and call the var execute function for render command
-    print(f"command is {command}")
     if not '{%' in command: # si aucun snippet/variable n'est dans la ligne, on rend juste la ligne splitted
-        print('any command in this line')
         return command.split(' ')
     else:
         splitted = command.split(' ') #sinon on commence par splitter la ligne
         for id, c in enumerate(splitted): #our enumerer les items
-            print(id, c)
             if not '{%' in c: #si le debut du snippet/variable n'est pas dans le mot on passe au suivant
                 continue
             else: 
@@ -66,7 +63,6 @@ def check_command_variables(command, vars, sub=False): #this function check if a
                 if '{%' in value:
                     value, vars = check_command_variables(content, vars, sub=True) #si un snippet est contenue dans le contenu (/!\ impossible de le mettre en type (1: inutile 2: ne sert à rien)) et
                 value, vars = variable_execute(vtype, value, vars) #on dit que c'est un sous appel -> recursion pour traiter tout les snippet/variables + on execute le snippet/variable
-                print(f'value is {value}')
                 if sub: #si c un sous programme on récupère juste la sortie de l'execution du sous snippet/variables avec le dictionnaire des variables
                     return value, vars
                 else:
@@ -87,17 +83,13 @@ def separate_variables(content):
 
 def variable_execute(typev, value, vars): #this function execute variable snippet and replace it for make valid commandline command
     for vartype in typev:
-        print(f"variables type: {vartype} value: {value}")
         try:
             value = vf.run_func(vartype, params=[value, vars])
-        except NotImplementedError:
-            print(f"not implemented for {vartype}")
-
+        except NotImplementedError as e:
             if vartype.split('=')[0] == 'v':
                 varname = vartype.split('=')[1]
                 if varname in vars:
                     value = vars[varname]
-                    print(f"acces to var: {varname} -> {value}")
                 else:
                     raise ValueError
             
@@ -105,10 +97,8 @@ def variable_execute(typev, value, vars): #this function execute variable snippe
                 varname = vartype.split('=')[1]
                 if varname not in vars:
                     vars[varname] = value
-                    print(f"set to var: {varname} -> {value}")
-
             else:
-                raise ValueError("unknown variable type %s" % vartype)
+                printc(str(ValueError("unknown variable type %s" % vartype)), alert='C')
 
     return value, vars
 

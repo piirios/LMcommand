@@ -8,12 +8,12 @@ vf = var_func()
 
 @vf.vartype('i')
 def input_value(value, vars):
-    res = input(strc(value, ltype='S'))
+    res = input(strc(value, ltype='S') + ' : ')
     return res
 
 @vf.vartype('ip')
 def input_password(value, vars):
-    pswd = blake3(bytes(getpass.getpass(strc('password:', ltype='S')), 'utf-8')).hexdigest()
+    pswd = blake3(bytes(getpass.getpass(strc('password : ', ltype='S')), 'utf-8')).hexdigest()
 
 @vf.vartype('path')
 def path_var(value, vars):

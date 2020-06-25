@@ -44,9 +44,9 @@ def command_traitement(content): #this is the core func where we call the var ch
     for command in content:
         command = command.rstrip()
         command = check_command_variables(command, vars)
-        res = call(command)
-        if res.returncode !=0:
-            print(f"erreur: {res.stderr}")
+        #res = call(command)
+        #if res.returncode !=0:
+        #    print(f"erreur: {res.stderr}")
 
 def check_command_variables(command, vars): #this function check if a variable is in the line and call the var execute function for render command
     print(f"command is {command}")
@@ -54,7 +54,23 @@ def check_command_variables(command, vars): #this function check if a variable i
         print('any command in this line')
         return command.split(' ')
     else:
+        for c in command.split(' '):
+            if not '{%' in c:
+                continue
+            else: 
+                start = c.find('{%')
+                end = c.rfind('%}')
+                content = c[start+2:end]
+                vtype, value = separate_variables(content)
+                if '{%' in value:
+                    _, value, vars = check_command_variables(content, vars)
+                value, vars = variable_execute(vtype, value, vars)
+                print(f'value is {value}')
+                print(f"start:{start} end:{end} content:{content}")
+                return vtype, value, vars
+        """
         command = command.split(' ')
+        print(command)
         id = [command.index(element) for element in command if '{%' in element][0]
         print(id)
         #rint(command[id].split('{%')[1].split('%}')[0])
@@ -70,32 +86,56 @@ def check_command_variables(command, vars): #this function check if a variable i
         command[id] = value_var
         print(f"variables type: {typev} value: {value} -> value:{value_var}") 
         return command
+        """
 
+def separate_variables(content):
+    print(content.split(':', 1))
+    typev, value = content.split(':', 1)[:2]
+    typev = separate_type_variable(typev)
+    print(f"variables type: {typev} value: {value}")
+    return typev, value
+
+def separate_type_variable(content):
+    return content.split('_')
 
 def variable_execute(typev, value, vars): #this function execute variable snippet and replace it for make valid commandline command
-    typev = typev.split('_')
-    print(f"variables type: {typev} value: {value}")
-    try:
-        vf.run_func(typev, params=[value, vars])
-    except NotImplementedError:
-        print(f"not implemented for {typev}")
-        if len([typev.index(element) for element in typev if 'v' in element]) != 0:
-            id = [typev.index(element) for element in typev if 'v' in element][0]
-            varname = typev[id].split('=')[1]
-            value = vars[varname]
+    for vartype in typev:
+        print(f"variables type: {vartype} value: {value}")
+        try:
+            value = vf.run_func(vartype, params=[value, vars])
+        except NotImplementedError:
+            print(f"not implemented for {vartype}")
+
+            if vartype == 's':
+                if value in vars:
+                    value =  vars[value]
+                else:
+                    raise ValueError
+            
+            elif vartype.split('=')[0] == 'v':
+                varname = vartype.split('=')[1]
+                if varname not in vars:
+                    vars[varname] = value
+
+            else:
+                raise ValueError("unknown variable type %s" % vartype)
+
+            """
+            if len([typev.index(element) for element in vartype if 'v' in element]) != 0:
+                id = [typev.index(element) for element in vartype if 'v' in element][0]
+                varname = typev[id].split('=')[1]
+                value = vars[varname]
 
 
-        elif 'path' in typev:
-            if value =='current':
-                value = os.path.abspath(os.path.curdir)
+            if len([typev.index(element) for element in vartype if 's' in element]) != 0:
+                id = [typev.index(element) for element in vartype if 's' in element][0]
+                varname = typev[id].split('=')[1]
+                vars[varname] = value
+                print(vars)
 
-        if len([typev.index(element) for element in typev if 's' in element]) != 0:
-            id = [typev.index(element) for element in typev if 's' in element][0]
-            varname = typev[id].split('=')[1]
-            vars[varname] = value
-            print(vars)
+            """
 
-        return value, vars
+    return value, vars
 
 
 l = load_file('test')

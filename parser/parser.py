@@ -1,5 +1,6 @@
 import os
 from caller import call
+from var_func import vf
 
 """
 parser of the file:
@@ -73,28 +74,28 @@ def check_command_variables(command, vars): #this function check if a variable i
 
 def variable_execute(typev, value, vars): #this function execute variable snippet and replace it for make valid commandline command
     typev = typev.split('_')
-    
-    if len([typev.index(element) for element in typev if 'v' in element]) != 0:
-        id = [typev.index(element) for element in typev if 'v' in element][0]
-        varname = typev[id].split('=')[1]
-        value = vars[varname]
+    print(f"variables type: {typev} value: {value}")
+    try:
+        vf.run_func(typev, params=[value, vars])
+    except NotImplementedError:
+        print(f"not implemented for {typev}")
+        if len([typev.index(element) for element in typev if 'v' in element]) != 0:
+            id = [typev.index(element) for element in typev if 'v' in element][0]
+            varname = typev[id].split('=')[1]
+            value = vars[varname]
 
-    elif 'i' in typev:
-        print(value)
-        value = ' '.join(value.split('_')) if '_' in value else value
-        value = input(f" {value}: ")
 
-    elif 'path' in typev:
-        if value =='current':
-            value = os.path.abspath(os.path.curdir)
+        elif 'path' in typev:
+            if value =='current':
+                value = os.path.abspath(os.path.curdir)
 
-    if len([typev.index(element) for element in typev if 's' in element]) != 0:
-        id = [typev.index(element) for element in typev if 's' in element][0]
-        varname = typev[id].split('=')[1]
-        vars[varname] = value
-        print(vars)
+        if len([typev.index(element) for element in typev if 's' in element]) != 0:
+            id = [typev.index(element) for element in typev if 's' in element][0]
+            varname = typev[id].split('=')[1]
+            vars[varname] = value
+            print(vars)
 
-    return value, vars
+        return value, vars
 
 
 l = load_file('test')

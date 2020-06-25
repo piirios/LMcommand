@@ -3,5 +3,5 @@ file_hash: lolollllllllll
 ----
 mkdir dev
 cd dev
-type nul > {%i_s=filename:{%i:{%i:{%i:double_test%}%}%}%}
+type nul > {%i_s=filename:{%i:double_test%}%}
 echo {%v=filename:%}

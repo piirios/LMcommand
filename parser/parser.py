@@ -44,59 +44,46 @@ def command_traitement(content): #this is the core func where we call the var ch
     for command in content:
         command = command.rstrip()
         command = check_command_variables(command, vars)
-        #res = call(command)
-        #if res.returncode !=0:
-        #    print(f"erreur: {res.stderr}")
+        print(f"command for call is {command}")
+        res = call(command)
+        if res.returncode !=0:
+            print(f"erreur: {res.stderr}")
 
-def check_command_variables(command, vars): #this function check if a variable is in the line and call the var execute function for render command
+def check_command_variables(command, vars, sub=False): #this function check if a variable is in the line and call the var execute function for render command
     print(f"command is {command}")
-    if not '{%' in command:
+    if not '{%' in command: # si aucun snippet/variable n'est dans la ligne, on rend juste la ligne splitted
         print('any command in this line')
         return command.split(' ')
     else:
-        for c in command.split(' '):
-            if not '{%' in c:
+        splitted = command.split(' ') #sinon on commence par splitter la ligne
+        for id, c in enumerate(splitted): #our enumerer les items
+            print(id, c)
+            if not '{%' in c: #si le debut du snippet/variable n'est pas dans le mot on passe au suivant
                 continue
             else: 
-                start = c.find('{%')
-                end = c.rfind('%}')
-                content = c[start+2:end]
-                vtype, value = separate_variables(content)
+                content = c[c.find('{%')+2:c.rfind('%}')] #on slice la string avec comme borne la première ouverture de snippet et la dernière fermeture du mot passer en paramètres
+                vtype, value = separate_variables(content) #on sépare le type du contenu
                 if '{%' in value:
-                    _, value, vars = check_command_variables(content, vars)
-                value, vars = variable_execute(vtype, value, vars)
+                    value, vars = check_command_variables(content, vars, sub=True) #si un snippet est contenue dans le contenu (/!\ impossible de le mettre en type (1: inutile 2: ne sert à rien)) et
+                value, vars = variable_execute(vtype, value, vars) #on dit que c'est un sous appel -> recursion pour traiter tout les snippet/variables + on execute le snippet/variable
                 print(f'value is {value}')
-                print(f"start:{start} end:{end} content:{content}")
-                return vtype, value, vars
-        """
-        command = command.split(' ')
-        print(command)
-        id = [command.index(element) for element in command if '{%' in element][0]
-        print(id)
-        #rint(command[id].split('{%')[1].split('%}')[0])
-        #print(command[id].split('{%')[1])
-        variable = command[id].lstrip('{%').rstrip('%}')
-        print(variable)
-        typev, value = variable.split(':', 1)
-        print(f"value before sub: {value}")
-        if value.startswith('{%'):
-            value = check_command_variables(value, vars)
-        value = value.strip() if isinstance(value, (int, str)) else value[0]
-        value_var, vars = variable_execute(typev.strip(),value, vars)
-        command[id] = value_var
-        print(f"variables type: {typev} value: {value} -> value:{value_var}") 
-        return command
-        """
+                if sub: #si c un sous programme on récupère juste la sortie de l'execution du sous snippet/variables avec le dictionnaire des variables
+                    return value, vars
+                else:
+                    splitted[id] = value #sinon si c'est le première appel, on formatte la ligne de mot avec le resultat
+                    return splitted
+"""
+
+ => on traite les variables/snippets par cascade
+
+"""
+
 
 def separate_variables(content):
-    print(content.split(':', 1))
-    typev, value = content.split(':', 1)[:2]
-    typev = separate_type_variable(typev)
-    print(f"variables type: {typev} value: {value}")
+    typev, value = content.split(':', 1) # on sépare le type et la valeur avec uniquement le premier split de ":" => evite de splitter des sous snippet/variables
+    typev = typev.split('_') #on traite les les types du snippet
     return typev, value
 
-def separate_type_variable(content):
-    return content.split('_')
 
 def variable_execute(typev, value, vars): #this function execute variable snippet and replace it for make valid commandline command
     for vartype in typev:
@@ -122,21 +109,6 @@ def variable_execute(typev, value, vars): #this function execute variable snippe
 
             else:
                 raise ValueError("unknown variable type %s" % vartype)
-
-            """
-            if len([typev.index(element) for element in vartype if 'v' in element]) != 0:
-                id = [typev.index(element) for element in vartype if 'v' in element][0]
-                varname = typev[id].split('=')[1]
-                value = vars[varname]
-
-
-            if len([typev.index(element) for element in vartype if 's' in element]) != 0:
-                id = [typev.index(element) for element in vartype if 's' in element][0]
-                varname = typev[id].split('=')[1]
-                vars[varname] = value
-                print(vars)
-
-            """
 
     return value, vars
 

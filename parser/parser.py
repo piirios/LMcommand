@@ -106,16 +106,19 @@ def variable_execute(typev, value, vars): #this function execute variable snippe
         except NotImplementedError:
             print(f"not implemented for {vartype}")
 
-            if vartype == 's':
-                if value in vars:
-                    value =  vars[value]
+            if vartype.split('=')[0] == 'v':
+                varname = vartype.split('=')[1]
+                if varname in vars:
+                    value = vars[varname]
+                    print(f"acces to var: {varname} -> {value}")
                 else:
                     raise ValueError
             
-            elif vartype.split('=')[0] == 'v':
+            elif vartype.split('=')[0] == 's':
                 varname = vartype.split('=')[1]
                 if varname not in vars:
                     vars[varname] = value
+                    print(f"set to var: {varname} -> {value}")
 
             else:
                 raise ValueError("unknown variable type %s" % vartype)

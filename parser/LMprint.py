@@ -84,6 +84,8 @@ def printc(text, ltype='Sy', alert='N'):
         header = f'[{color.CGREEN}>{color.CEND}] '
     elif ltype == 'Sy':
         header = f'[{color.CGREEN}System{color.CEND}] '
+    elif ltype == None:
+        header = ''
     else:
         raise Exception("Invalid ltype it's ony can by 'R', 'S' or 'Sy'")
 

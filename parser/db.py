@@ -1,6 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, ForeignKey, update, create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
+from LMprint import printc
 
 Base = declarative_base()
 
@@ -42,19 +43,36 @@ def get_command(session, command_name):
     else:
         raise ValueError('command not found')
 
+def get_all(session):
+    return session.query(Command).all()
+
+def del_all(session):
+    for c in get_all(session):
+        remove_command(session, c.token)
+
 def check_command_exists(session, command_name):
     if session.query(Command).filter_by(command_name=command_name).first() is None:
         return False
     else:
         return True
 
-def verify_command_hash(session, command_name, hash_file):
+def verify_command_hash(session, command_name, new_hash, file_hash):
     if check_command_exists(session, command_name):
         hash_saved = get_command(session, command_name).hash
-        if hash_saved == hash_file:
+        print(hash_saved, file_hash)
+        if hash_saved == file_hash == new_hash:
             return True
         else :
+            printc('le hash de la commande est invalide!', ltype=None, alert='C')
             return False
+
+def verify_command_token(session, command_name, token):
+    command = get_command(session, command_name)
+    if command.token == token:
+        return True
+    else:
+        printc('le token de la commande est invalide!', ltype=None, alert='C')
+        return False
 
 def update_command_hash(session, command_name, old_hash, new_hash):
     if verify_command_hash(session, command_name, old_hash):
@@ -68,12 +86,13 @@ def update_command_hash(session, command_name, old_hash, new_hash):
 
 def remove_command(session, token):
     if session.query(Command).filter_by(token=token).first() is not None:
-        session.delete(session.query(Command).filter_by(token=token).first())
+        session.delete(session.query(Command).get(session.query(Command).filter_by(token=token).first().id))
+        session.commit()
     else:
         print("token don't exist!")
 
-def init_db():
-    engine = create_engine("sqlite:///command.db", echo=False)
+def init_db(echo=False):
+    engine = create_engine("sqlite:///command.db", echo=echo)
     Session = sessionmaker(bind=engine)
     ses = Session()
     create_table_command(engine)

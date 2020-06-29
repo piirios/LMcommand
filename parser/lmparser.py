@@ -2,6 +2,8 @@ import os
 from caller import call
 from var_func import vf
 from LMprint import printc, strc
+from db import verify_command_hash, verify_command_token
+from hash import hash_content, verify_sign
 
 """
 parser of the file:
@@ -33,12 +35,17 @@ def separate_headers(l): #separate the header of the content in compiled file
     content = l[i+1:]
     return header, content
 
-def header_check(header): # TODO: implement file hash verification and token verify
-    token = header[0].split(':')[1].strip()
-    filehash = header[1].split(':')[1].strip()
-    return token, filehash
+def header_check(ses, header,command_name, content): # TODO: implement file hash verification and token verify
+    filehash = header[0].split(':')[1].strip()
+    token = header[1].split(':')[1].strip()
+    print(content)
+    print(hash_content(content))
+    if verify_command_hash(ses, command_name, hash_content(content), filehash) and verify_sign(*token.split('.')) and verify_command_token(ses, command_name, token.split('.')[0]):
+        return True
+    else:
+        return False
 
-def command_traitement(content): #this is the core func where we call the var checker, call the func into subprocess and check the result
+def command_traitement(content, *args, **kwargs): #this is the core func where we call the var checker, call the func into subprocess and check the result
     vars = {}
     for command in content:
         command = command.rstrip()

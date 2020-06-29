@@ -1,6 +1,3 @@
-token: 123456.testhash
-file_hash: lolollllllllll
-----
 mkdir dev
 cd dev
 type nul > {%i_s=filename:{%i:double_test%}%}

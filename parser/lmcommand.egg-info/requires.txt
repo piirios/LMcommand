@@ -1,0 +1,4 @@
+Click
+SQLAlchemy
+blake3
+tabulate

@@ -1,5 +1,5 @@
 file_hash: 84456c372299017f6c210103d247f5a99baa03ce9667e5e8b034335eaa99c1d5
-token: b'p,\xed\x13\xe18\xc7Z*\xc2z\xe0\xc3\xc6US'.e32a04b4820d096e2a0468eec3baeb1599f244446bf473dba7552c80c4bdebf1
+token: b'\x8dM\xd5\xee\xf0\x85dm=`\xb5\x19\\\xd3\xa9\xef'.c61de07e0706fe92727cd3d34a0c9ba77a9a733e1f272fd2b11f5eb4b260c3ae
 ----
 mkdir test
 cd test

@@ -1,4 +1,4 @@
-from decorator import var_func
+from lmdecorator import var_func
 import getpass
 from blake3 import blake3
 from LMprint import strc, printc

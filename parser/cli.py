@@ -1,7 +1,7 @@
 import click
 from lmparser import load_file, separate_headers, header_check, command_traitement
 from hash import hash_content, hash_token, gen_token
-from db import init_db, get_command, check_command_exists, add_command, get_all, del_all
+from db import init_db, get_command, check_command_exists, add_command, get_all, del_all, remove_command
 from os import path
 import base64
 from tabulate import tabulate
@@ -67,8 +67,14 @@ def list_command():
         dic_command['name'].append(command.command_name)
         dic_command['filepath'].append(command.filepath)
 
-    print(dic_command['name'])
     print(tabulate(dic_command, headers='keys', tablefmt="pretty"))
+
+
+@main.command()
+@click.argument('script')
+def remove(script):
+    _, session = init_db()
+    remove_command(session, script)
 
 
 if __name__ == '__main__':

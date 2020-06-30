@@ -1,4 +1,9 @@
 from setuptools import setup
+import os
+
+
+os.environ['LMC_db'] = 'E:\programation\python\LMmanager\lmcommand\parser\db\command.db'
+print(os.environ.get('LMC_db'))
 
 setup(
     name='lmcommand',

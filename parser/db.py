@@ -2,6 +2,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, ForeignKey, update, create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from LMprint import printc
+import os
 
 Base = declarative_base()
 
@@ -59,7 +60,6 @@ def check_command_exists(session, command_name):
 def verify_command_hash(session, command_name, new_hash, file_hash):
     if check_command_exists(session, command_name):
         hash_saved = get_command(session, command_name).hash
-        print(hash_saved, file_hash)
         if hash_saved == file_hash == new_hash:
             return True
         else :
@@ -84,15 +84,16 @@ def update_command_hash(session, command_name, old_hash, new_hash):
             session.rollback()
 
 
-def remove_command(session, token):
-    if session.query(Command).filter_by(token=token).first() is not None:
-        session.delete(session.query(Command).get(session.query(Command).filter_by(token=token).first().id))
+def remove_command(session, command_name):
+    if session.query(Command).filter_by(command_name=command_name).first() is not None:
+        session.delete(session.query(Command).get(session.query(Command).filter_by(command_name=command_name).first().id))
         session.commit()
     else:
-        print("token don't exist!")
+        print("script don't exist!")
 
 def init_db(echo=False):
-    engine = create_engine("sqlite:///command.db", echo=echo)
+    path = 'E:\programation\python\LMmanager\lmcommand\parser\db\command.db'
+    engine = create_engine("sqlite:///{}".format(path), echo=echo)
     Session = sessionmaker(bind=engine)
     ses = Session()
     create_table_command(engine)

@@ -38,14 +38,14 @@ def separate_headers(l): #separate the header of the content in compiled file
 def header_check(ses, header,command_name, content): # TODO: implement file hash verification and token verify
     filehash = header[0].split(':')[1].strip()
     token = header[1].split(':')[1].strip()
-    print(content)
-    print(hash_content(content))
-    if verify_command_hash(ses, command_name, hash_content(content), filehash) and verify_sign(*token.split('.')) and verify_command_token(ses, command_name, token.split('.')[0]):
+    if verify_command_hash(ses, command_name, hash_content(content), filehash) and verify_sign(*token.rsplit('.',1)) and verify_command_token(ses, command_name, token.rsplit('.',1)[0]):
         return True
     else:
         return False
 
 def command_traitement(content, *args, **kwargs): #this is the core func where we call the var checker, call the func into subprocess and check the result
+    print(os.getcwd())
+    print(os.path.curdir)
     debug = kwargs.get('debug', False)
     vars = {}
     for id, command in enumerate(content):

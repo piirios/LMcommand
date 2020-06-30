@@ -17,6 +17,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        lmc=cli:main
+        lmc=lmcli:main
     ''',
 )

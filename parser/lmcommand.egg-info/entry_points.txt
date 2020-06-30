@@ -1,4 +1,4 @@
 
         [console_scripts]
-        lmc=cli:main
+        lmc=lmcli:main
     

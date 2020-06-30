@@ -1,0 +1,9 @@
+file_hash: ff4b909c17ecd8fb287409956ce5b6e5f2ff1941d88d385ef4791754889c6803
+token: b'\xe3\xd4\xe3\xac\x008\x85\xf3\x05\x18\xbcG\xf5},\xcc'.6faca4a7da8498f52f189daa632bb69228bff70fc6462ae03b3c3e5953dfda3d
+----
+mkdir test
+cd test
+{%py:/test/test2/test2.py%}
+{%co:test}
+type nul > {%i_s=filename:{%i:double_test%}%}
+echo {%v=filename:%}

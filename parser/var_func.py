@@ -4,6 +4,7 @@ from blake3 import blake3
 from LMprint import strc, printc
 import caller
 import os
+from db import get_command, init_db
 
 vf = var_func()
 
@@ -38,5 +39,11 @@ def python_code(value, vars):
 
 @vf.vartype('co')
 def command(value, vars):
-    print(value)
-    return
+    from lmparser import load_file,header_check, separate_headers, command_traitement
+    _, session = init_db()
+    command_obj = get_command(session,value)
+    lines = load_file(command_obj.filepath)
+    header, content = separate_headers(lines)
+    if header_check(session, header,value, content):
+        command_traitement(content)
+    return 

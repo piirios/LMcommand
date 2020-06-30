@@ -1,6 +1,5 @@
 LMprint.py
 caller.py
-cli.py
 db.py
 hash.py
 lmparser.py

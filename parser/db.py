@@ -1,11 +1,12 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, ForeignKey, update, create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
+from dotenv import load_dotenv
 from LMprint import printc
 import os
 
 Base = declarative_base()
-
+load_dotenv()
 class Command(Base):
     __tablename__ = "Command"
     id = Column('id', Integer, primary_key=True)
@@ -92,7 +93,7 @@ def remove_command(session, command_name):
         print("script don't exist!")
 
 def init_db(echo=False):
-    path = 'E:\programation\python\LMmanager\lmcommand\parser\db\command.db'
+    path = f"{os.getenv('WORKDIR')}/db/command.db"
     engine = create_engine("sqlite:///{}".format(path), echo=echo)
     Session = sessionmaker(bind=engine)
     ses = Session()

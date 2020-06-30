@@ -1,8 +1,0 @@
-file_hash: 9e76e54cd4caf1c35feb56c1dc8b5044302f524e4394b00e20a2fafcd0078442
-token: b'\x15\xe1\x86\x8dj\xc6b\xad\xa3\xfc!"\xc5\xab\x9cJ'.98911b0efcf65fc9f5b1f9c4dc294496d8cc4b65324fe071aa3d03ce6aedddfd
-----
-mkdir lol
-cd test
-{%py:/test/test2/test2.py%}
-type nul > {%i_s=filename:{%i:double_test%}%}
-echo {%v=filename:%}

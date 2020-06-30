@@ -14,6 +14,7 @@ setup(
         'SQLAlchemy',
         'blake3',
         'tabulate',
+        'python-dotenv',
     ],
     entry_points='''
         [console_scripts]

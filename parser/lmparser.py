@@ -46,15 +46,19 @@ def header_check(ses, header,command_name, content): # TODO: implement file hash
         return False
 
 def command_traitement(content, *args, **kwargs): #this is the core func where we call the var checker, call the func into subprocess and check the result
+    debug = kwargs.get('debug', False)
     vars = {}
-    for command in content:
+    for id, command in enumerate(content):
         command = command.rstrip()
         command = check_command_variables(command, vars)
-        printc(' '.join(command), ltype='Sy')
+        if debug: printc(' '.join(command), ltype='Sy')
         res = call(command)
         if res.returncode !=0:
-            printc(res.stderr.strip(), ltype='Sy', alert='C')
-
+            if debug: printc(res.stderr.strip(), ltype='Sy', alert='C') 
+            else: printc(f"err on command {id} ({' '.join(command)}) : {res.stderr.strip()}", ltype='Sy', alert='C')
+            continue
+        if res.stdout != '':
+            printc(res.stdout.strip(), ltype='R')
 def check_command_variables(command, vars, sub=False): #this function check if a variable is in the line and call the var execute function for render command
     if not '{%' in command: # si aucun snippet/variable n'est dans la ligne, on rend juste la ligne splitted
         return command.split(' ')
@@ -72,9 +76,13 @@ def check_command_variables(command, vars, sub=False): #this function check if a
                 if sub: #si c un sous programme on récupère juste la sortie de l'execution du sous snippet/variables avec le dictionnaire des variables
                     return value, vars
                 else:
-                    splitted[id] = value #sinon si c'est le première appel, on formatte la ligne de mot avec le resultat
+                    if value is not None:
+                        if isinstance(value, list):
+                            splitted = value
+                        else:
+                            splitted[id] = value #sinon si c'est le première appel, on formatte la ligne de mot avec le resultat
                     return splitted
-"""
+"""         
 
  => on traite les variables/snippets par cascade
 

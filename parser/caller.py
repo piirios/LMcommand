@@ -1,11 +1,13 @@
-from subprocess import run
+from subprocess import run, PIPE
+import os
 
 """
 TODO:
 [] finish the caller process
-  [] change run by popen
-  [] cwd control
+    [] change run by popen
+    [] cwd control
 """
 
 def call(command):
-    return run(command, capture_output=True, text=True, shell=True)
+    res = run(command, text=True, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, cwd=os.getcwd())
+    return res

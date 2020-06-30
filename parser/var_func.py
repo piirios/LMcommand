@@ -2,6 +2,7 @@ from decorator import var_func
 import getpass
 from blake3 import blake3
 from LMprint import strc, printc
+import caller
 import os
 
 vf = var_func()
@@ -28,3 +29,14 @@ def path_var(value, vars):
                 raise ValueError("specified path isn't a directory")
         else:
             raise ValueError("Directory doesn't exist!")
+
+@vf.vartype('py')
+def python_code(value, vars):
+    value = f'{os.getcwd()}{ os.path.normpath(value)}'
+    value = "python {}".format(value).split(' ')
+    return value
+
+@vf.vartype('co')
+def command(value, vars):
+    print(value)
+    return

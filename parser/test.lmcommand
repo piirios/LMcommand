@@ -1,4 +1,5 @@
-mkdir dev
-cd dev
+mkdir test
+cd test
+{%py:/test/test2/test2.py%}
 type nul > {%i_s=filename:{%i:double_test%}%}
 echo {%v=filename:%}

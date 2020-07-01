@@ -4,6 +4,7 @@ from var_func import vf
 from LMprint import printc, strc
 from db import verify_command_hash, verify_command_token
 from hash import hash_content, verify_sign
+from shlex import split
 
 """
 parser of the file:
@@ -44,8 +45,6 @@ def header_check(ses, header,command_name, content): # TODO: implement file hash
         return False
 
 def command_traitement(content, *args, **kwargs): #this is the core func where we call the var checker, call the func into subprocess and check the result
-    print(os.getcwd())
-    print(os.path.curdir)
     debug = kwargs.get('debug', False)
     vars = {}
     for id, command in enumerate(content):
@@ -61,9 +60,9 @@ def command_traitement(content, *args, **kwargs): #this is the core func where w
             printc(res.stdout.strip(), ltype='R')
 def check_command_variables(command, vars, sub=False): #this function check if a variable is in the line and call the var execute function for render command
     if not '{%' in command: # si aucun snippet/variable n'est dans la ligne, on rend juste la ligne splitted
-        return command.split(' ')
+        return split(command)
     else:
-        splitted = command.split(' ') #sinon on commence par splitter la ligne
+        splitted = split(command) #sinon on commence par splitter la ligne
         for id, c in enumerate(splitted): #our enumerer les items
             if not '{%' in c: #si le debut du snippet/variable n'est pas dans le mot on passe au suivant
                 continue
@@ -80,7 +79,11 @@ def check_command_variables(command, vars, sub=False): #this function check if a
                         if isinstance(value, list):
                             splitted = value
                         else:
-                            splitted[id] = value #sinon si c'est le première appel, on formatte la ligne de mot avec le resultat
+                            #c[c.find('{%'):c.rfind('%}')+2] = value
+                            start = c.find('{%')
+                            end = c.rfind('%}')+2
+                            c = c[:start] + value + c[end:]
+                            splitted[id] = c #sinon si c'est le première appel, on formatte la ligne de mot avec le resultat
                     return splitted
 """         
 
@@ -90,6 +93,7 @@ def check_command_variables(command, vars, sub=False): #this function check if a
 
 
 def separate_variables(content):
+    print(content)
     typev, value = content.split(':', 1) # on sépare le type et la valeur avec uniquement le premier split de ":" => evite de splitter des sous snippet/variables
     typev = typev.split('_') #on traite les les types du snippet
     return typev, value
@@ -100,10 +104,9 @@ def variable_execute(typev, value, vars): #this function execute variable snippe
         try:
             value = vf.run_func(vartype, params=[value, vars])
         except NotImplementedError as e:
-            if vartype.split('=')[0] == 'v':
-                varname = vartype.split('=')[1]
-                if varname in vars:
-                    value = vars[varname]
+            if vartype == 'v':
+                if value in vars:
+                    value = vars[value]
                 else:
                     raise ValueError
             

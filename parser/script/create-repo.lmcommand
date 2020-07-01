@@ -1,0 +1,11 @@
+file_hash: 6a6c30d6f90144763f1ec39612b2c426014a6112d31289f16744112cdbbe5805
+token: b'1\xfb\x88\xb9\x12\x9b\xaaUK\xe6\x1f\xberhG\xe8'.0e57f6980a6bd0cddfba9116f4b9af8a6107c0a72be2e9eaf22819c92d62550e
+----
+echo {%i_s=repo:Entrez_le_nom_de_votre_repo%}
+echo {%v:repo%}
+{%py:/python-script/create_repo.pyy {%v:repo%}%}
+git init
+git commit -m "first commit for {%v:repo%}"
+git add .
+git remote add origin https://github.com/piirios/{%v:repo%}.git
+git push -u origin master

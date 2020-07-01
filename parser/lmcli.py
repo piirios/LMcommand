@@ -51,13 +51,14 @@ def compile(filepath, name, workdir):
 
 @main.command()
 @click.argument('script')
-def run(script, *args, **kwargs):
+@click.option('--debug', '-d', is_flag=True,)
+def run(script,debug):
     _, session = init_db()
     command_obj = get_command(session,script)
     lines = load_file(command_obj.filepath)
     header, content = separate_headers(lines)
     if header_check(session, header,script, content):
-        command_traitement(content,*args, **kwargs)
+        command_traitement(content, debug=debug)
 
 
 @main.command()
